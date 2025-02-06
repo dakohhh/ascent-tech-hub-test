@@ -1,7 +1,7 @@
 import { ApiProperty, ApiPropertyOptional } from "@nestjs/swagger";
 import { IsOptional, IsNumber } from "class-validator";
 import { Transform } from "class-transformer";
-
+import { IPaginationMeta, IPaginationResult } from "../utils/pagination";
 export class PaginationDto {
   @ApiPropertyOptional({ type: Number, default: 1 })
   @IsOptional()
@@ -16,16 +16,10 @@ export class PaginationDto {
   limit: number = 10;
 }
 
-export class PaginationResponseDto {
-  @ApiProperty()
-  page: number;
+export class PaginationResponseDto<T> implements IPaginationResult<T> {
+  @ApiProperty({ isArray: true })
+  data: T[];
 
   @ApiProperty()
-  limit: number;
-
-  @ApiProperty()
-  total_pages: number;
-
-  @ApiProperty()
-  total_docs: number;
+  meta: IPaginationMeta;
 }

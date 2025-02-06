@@ -1,12 +1,11 @@
 import "./sentry";
-
+import { AppModule } from "./app.module";
 import { NestFactory } from "@nestjs/core";
 import basicAuth from "express-basic-auth";
+import { ConfigService } from "@nestjs/config";
 import { CONFIGS, APP_VERSION } from "../configs";
 import { ValidationPipe, VersioningType } from "@nestjs/common";
 import { DocumentBuilder, SwaggerModule } from "@nestjs/swagger";
-
-import { AppModule } from "./app.module";
 import { RedisIoAdapter } from "./common/adapters/redis-adapter";
 import { AllExceptionFilter } from "./common/filters/all-exception.filter";
 
@@ -17,6 +16,8 @@ async function bootstrap() {
 
   const redisIoAdapter = new RedisIoAdapter(app);
   await redisIoAdapter.connectToRedis();
+
+  const configService = app.get(ConfigService);
 
   app.useWebSocketAdapter(redisIoAdapter);
   app.enableCors({ credentials: true, origin: [...CONFIGS.CORS_ALLOWED_ORIGINS] });
@@ -32,8 +33,11 @@ async function bootstrap() {
     },
   });
 
-  await app.listen(process.env.PORT || 4000);
+  const PORT = configService.get("CONFIGS.PORT");
+  const HOST = configService.get("CONFIGS.HOST");
 
-  console.log(`Application started at: ${await app.getUrl()}`);
+  await app.listen(PORT);
+
+  console.log(`Application started at: ${HOST}:${PORT}`);
 }
 bootstrap();

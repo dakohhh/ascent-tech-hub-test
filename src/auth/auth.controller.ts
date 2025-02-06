@@ -1,6 +1,3 @@
-import { ApiBody, ApiOperation, ApiTags } from "@nestjs/swagger";
-import { Body, Request, Controller, Post, UseGuards, HttpStatus, HttpCode, Get } from "@nestjs/common";
-
 import { LoginDto } from "./dto/login.dto";
 import { AuthService } from "./auth.service";
 import { RegisterDto } from "./dto/register.dto";
@@ -9,15 +6,13 @@ import { TokenService } from "src/token/token.service";
 import { LocalAuthGuard } from "./guards/local-auth.guard";
 import { JwtRefreshGuard } from "./guards/jwt-refresh.guard";
 import { HttpResponse } from "src/common/dto/http-response.dto";
+import { ApiBody, ApiOperation, ApiTags } from "@nestjs/swagger";
 import { AuthTokensDto, RefreshTokenDto, AuthenticationResponseDto } from "./dto/auth.dto";
+import { Body, Request, Controller, Post, UseGuards, HttpStatus, HttpCode } from "@nestjs/common";
 import { ApiHttpErrorResponses, ApiHttpResponse } from "src/common/decorators/custom-decorator";
-import { EmailVerificationDto, RequestEmailVerificationDto } from "./dto/email-verification.dto";
-import { PasswordResetDto, RequestPasswordResetDto, RequestPasswordResetResponseDto } from "./dto/password-reset.dto";
-// import { GoogleOauthGuard } from "./guards/google-oauth.guard";
-// import { AppleOauthGuard } from "./guards/apple-oauth.guard";
 
 @ApiTags("Authentication")
-@Controller({ path: "auth", version: "1" })
+@Controller({ path: "api/auth" })
 export class AuthController {
   constructor(
     private readonly authService: AuthService,
@@ -68,108 +63,4 @@ export class AuthController {
     const result = await this.tokenService.revokeRefreshToken(req.user.user, req.user.token);
     return new HttpResponse("User logged out", result, HttpStatus.OK);
   }
-
-  @ApiOperation({ summary: "Request Email Verification" })
-  @ApiHttpErrorResponses()
-  @ApiBody({ type: RequestEmailVerificationDto })
-  @ApiHttpResponse({ status: 200, type: Boolean, description: "Requests email verification for a user" })
-  @HttpCode(200)
-  @Post("request-email-verification")
-  async requestEmailVerification(@Body() requestEmailVerificationDto: RequestEmailVerificationDto) {
-    const result = await this.authService.requestEmailVerification(requestEmailVerificationDto);
-    return new HttpResponse("Email verification requested", result, HttpStatus.OK);
-  }
-
-  @ApiOperation({ summary: "Verify Email" })
-  @ApiHttpErrorResponses()
-  @ApiBody({ type: EmailVerificationDto })
-  @ApiHttpResponse({ status: 200, type: Boolean, description: "Verifies the email of a user" })
-  @HttpCode(200)
-  @Post("verify-email")
-  async verifyEmail(@Body() emailVerificationDto: EmailVerificationDto) {
-    const result = await this.authService.verifyEmail(emailVerificationDto);
-    return new HttpResponse("Email verified", result, HttpStatus.OK);
-  }
-
-  @ApiOperation({ summary: "Request Password Reset" })
-  @ApiHttpErrorResponses()
-  @ApiBody({ type: RequestPasswordResetDto })
-  @ApiHttpResponse({ status: 200, type: RequestPasswordResetResponseDto, description: "Requests password reset for a user" })
-  @HttpCode(200)
-  @Post("request-password-reset")
-  async requestPasswordReset(@Body() requestResetPasswordDto: RequestPasswordResetDto) {
-    const result = await this.authService.requestPasswordReset(requestResetPasswordDto);
-    return new HttpResponse("Password reset requested", result, HttpStatus.OK);
-  }
-
-  @ApiOperation({ summary: "Reset Password" })
-  @ApiHttpErrorResponses()
-  @ApiBody({ type: PasswordResetDto })
-  @ApiHttpResponse({ status: 200, type: Boolean, description: "Resets the password of a user" })
-  @HttpCode(200)
-  @Post("reset-password")
-  async resetPassword(@Body() passwordResetDto: PasswordResetDto) {
-    const result = await this.authService.resetPassword(passwordResetDto);
-    return new HttpResponse("Password reset", result, HttpStatus.OK);
-  }
-
-  @ApiOperation({ summary: "Create Roles" })
-  @ApiHttpErrorResponses()
-  @ApiBody({ type: PasswordResetDto })
-  @ApiHttpResponse({ status: 200, type: Boolean, description: "Resets the password of a user" })
-  @HttpCode(200)
-  @Post("roles")
-  async createRoles(@Body() passwordResetDto: PasswordResetDto) {
-    const result = await this.authService.resetPassword(passwordResetDto);
-    return new HttpResponse("Password reset", result, HttpStatus.OK);
-  }
-
-  @ApiOperation({ summary: "Create Roles" })
-  @ApiHttpErrorResponses()
-  @ApiBody({ type: PasswordResetDto })
-  @ApiHttpResponse({ status: 200, type: Boolean, description: "Resets the password of a user" })
-  @HttpCode(200)
-  @Get("roles")
-  async getRoles(@Body() passwordResetDto: PasswordResetDto) {
-    const result = await this.authService.resetPassword(passwordResetDto);
-    return new HttpResponse("Password reset", result, HttpStatus.OK);
-  }
-
-  // @ApiOperation({ summary: "Google Auth" })
-  // @ApiHttpErrorResponses()
-  // @ApiHttpResponse({ status: 200, type: AuthenticationResponseDto, description: "Logs in a user using Google OAuth" })
-  // @HttpCode(200)
-  // @Get("google")
-  // @UseGuards(GoogleOauthGuard)
-  // async auth() {}
-
-  // @ApiOperation({ summary: "Google Auth Callback" })
-  // @ApiHttpErrorResponses()
-  // @ApiHttpResponse({ status: 200, type: AuthenticationResponseDto, description: "Logs in a user using Google OAuth" })
-  // @HttpCode(200)
-  // @Get("google/callback")
-  // @UseGuards(GoogleOauthGuard)
-  // async googleAuthCallback(@Request() req: Request & { user: User }) {
-  //   const result = await this.authService.oauthLogin(req.user);
-  //   return new HttpResponse("User logged in", result, HttpStatus.OK);
-  // }
-
-  // @ApiOperation({ summary: "Apple Auth" })
-  // @ApiHttpErrorResponses()
-  // @ApiHttpResponse({ status: 200, type: AuthenticationResponseDto, description: "Logs in a user using Google OAuth" })
-  // @HttpCode(200)
-  // @Get("apple")
-  // @UseGuards(AppleOauthGuard)
-  // async appleAuth() {}
-
-  // @ApiOperation({ summary: "apple Auth Callback" })
-  // @ApiHttpErrorResponses()
-  // @ApiHttpResponse({ status: 200, type: AuthenticationResponseDto, description: "Logs in a user using Google OAuth" })
-  // @HttpCode(200)
-  // @Post("apple/callback")
-  // @UseGuards(AppleOauthGuard)
-  // async appleAuthCallback(@Request() req: Request & { user: User }) {
-  //   const result = await this.authService.oauthLogin(req.user);
-  //   return new HttpResponse("User logged in", result, HttpStatus.OK);
-  // }
 }

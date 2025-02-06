@@ -29,6 +29,7 @@ const GLOBAL_CONSTANTS = {
   APP_DESCRIPTION: ".",
   SUPPORT_EMAIL: "",
   DEFAULT_EMAIL_FROM: "",
+  PORT: +process.env.PORT || 4000,
 
   // AI
   // ============================================================
@@ -126,6 +127,34 @@ const CONFIG_BUILDER = {
     SWAGGER: {
       PATH: "/docs",
       PASSWORD: process.env.SWAGGER_PASSWORD!,
+    },
+  },
+
+  test: {
+    ...GLOBAL_CONSTANTS,
+
+    HOST: "127.0.0.1",
+
+    PORT: 3000,
+    JWT_SECRET: "test-secret",
+    MONGO_URI: "mongodb://localhost:27017/test-db",
+    REDIS_URI: "redis://localhost:6379",
+
+    // System Constants
+    // ============================================================
+    URL: {
+      API_BASE_URL: "",
+      AUTH_BASE_URL: "",
+      LANDING_BASE_URL: "",
+    },
+
+    // App Level Configs
+    // ============================================================
+    CORS_ALLOWED_ORIGINS: ["", ""],
+
+    SWAGGER: {
+      PATH: "/docs",
+      PASSWORD: "password",
     },
   },
 } as const;

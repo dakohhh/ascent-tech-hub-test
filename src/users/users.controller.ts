@@ -1,23 +1,22 @@
-import { FileInterceptor } from "@nestjs/platform-express";
-import { ApiBearerAuth, ApiConsumes, ApiOperation, ApiTags } from "@nestjs/swagger";
-import { Request, Controller, Get, UseGuards, HttpStatus, Patch, Body, UseInterceptors, UploadedFile, ParseFilePipeBuilder, Post, Delete, Param } from "@nestjs/common";
-
-import { CONFIGS } from "../../configs";
 import { User } from "./user.schema";
+import { CONFIGS } from "../../configs";
 import { UsersService } from "./users.service";
 import { JWTRoleGuard } from "src/auth/guards/jwt-role.guard";
 import { JwtAuthGuard } from "src/auth/guards/jwt-auth.guard";
-import { PaginationDto } from "src/common/dto/pagination.dto";
+import { PaginationDto, PaginationResponseDto } from "src/common/dto/pagination.dto";
 import { HttpResponse } from "src/common/dto/http-response.dto";
-import { GetAllUsersResponseDto, UpdateUserDto, UserAddImageDto, UserUpdateImageDto } from "./user.dto";
+import { UpdateUserDto } from "./dto/user.dto";
+import { ApiBearerAuth, ApiOperation, ApiTags } from "@nestjs/swagger";
+import { Request, Controller, Get, UseGuards, HttpStatus, Body, Param, Put, Post, Delete, BadRequestException } from "@nestjs/common";
 import { ApiHttpErrorResponses, ApiHttpResponse, ApiPaginationQuery, PaginationQuery } from "src/common/decorators/custom-decorator";
+import { CreateUserDto } from "./dto/create-user.dto";
 
 @ApiTags("Users")
-@Controller({ path: "users", version: "1" })
+@Controller({ path: "api/users" })
 export class UsersController {
   constructor(private readonly usersService: UsersService) {}
 
-  @ApiOperation({ summary: "Get User Session" })
+  @ApiOperation({ summary: "Get Current Logged In User Session" })
   @ApiBearerAuth()
   @ApiHttpErrorResponses()
   @ApiHttpResponse({ status: 200, type: User, description: "Returns the user session" })
@@ -27,72 +26,62 @@ export class UsersController {
     return new HttpResponse("User session", req.user, HttpStatus.OK);
   }
 
-  @ApiOperation({ summary: "Update User" })
-  @ApiBearerAuth()
-  @ApiHttpErrorResponses()
-  @ApiHttpResponse({ status: 200, type: User, description: "Updates the user information" })
-  @Patch("update-profile")
-  @UseGuards(JWTRoleGuard(CONFIGS.ROLES.USER))
-  async updateUserProfile(@Body() updateUserDto: UpdateUserDto, @Request() req: Request & { user: User }) {
-    const result = await this.usersService.updateUser(req.user, { ...updateUserDto });
-    return new HttpResponse("User profile updated", result, HttpStatus.OK);
-  }
-
-  @ApiOperation({ summary: "Add User Image" })
-  @ApiBearerAuth()
-  @ApiHttpErrorResponses()
-  @ApiHttpResponse({ status: 200, type: User, description: "Adds an image to the user profile" })
-  @Post("images")
-  @ApiConsumes("multipart/form-data")
-  @UseInterceptors(FileInterceptor("file"))
-  @UseGuards(JWTRoleGuard(CONFIGS.ROLES.USER))
-  async addUserImage(
-    @Body() body: UserAddImageDto,
-    @Request() req: Request & { user: User },
-    @UploadedFile(new ParseFilePipeBuilder().addFileTypeValidator({ fileType: "image/*" }).addMaxSizeValidator({ maxSize: 1000000 }).build({ fileIsRequired: true, errorHttpStatusCode: HttpStatus.UNPROCESSABLE_ENTITY })) file: Express.Multer.File
-  ) {
-    const result = await this.usersService.userAddImage(req.user, { file });
-    return new HttpResponse("User image added", result, HttpStatus.OK);
-  }
-
-  @ApiOperation({ summary: "Update User Image" })
-  @ApiBearerAuth()
-  @ApiHttpErrorResponses()
-  @ApiHttpResponse({ status: 200, type: User, description: "Updates an image in the user profile" })
-  @Patch("images/:image_url")
-  @ApiConsumes("multipart/form-data")
-  @UseInterceptors(FileInterceptor("file"))
-  @UseGuards(JWTRoleGuard(CONFIGS.ROLES.USER))
-  async updateUserImage(
-    @Body() body: UserUpdateImageDto,
-    @Request() req: Request & { user: User },
-    @UploadedFile(new ParseFilePipeBuilder().addFileTypeValidator({ fileType: "image/*" }).addMaxSizeValidator({ maxSize: 1000000 }).build({ fileIsRequired: true, errorHttpStatusCode: HttpStatus.UNPROCESSABLE_ENTITY })) file: Express.Multer.File
-  ) {
-    const result = await this.usersService.userUpdateImage(req.user, { ...body, file });
-    return new HttpResponse("User image updated", result, HttpStatus.OK);
-  }
-
-  @ApiOperation({ summary: "Delete User Image" })
-  @ApiBearerAuth()
-  @ApiHttpErrorResponses()
-  @ApiHttpResponse({ status: 200, type: User, description: "Deletes an image from the user profile" })
-  @Delete("images/:images_url")
-  @UseGuards(JWTRoleGuard(CONFIGS.ROLES.USER))
-  async deleteUserImage(@Param("images_url") imageUrl: string, @Request() req: Request & { user: User }) {
-    console.log("imageUrl", imageUrl);
-    const result = await this.usersService.userDeleteImage(req.user, imageUrl);
-    return new HttpResponse("User image deleted", result, HttpStatus.OK);
-  }
-
   @ApiOperation({ summary: "Get All Users" })
   @ApiBearerAuth()
   @ApiPaginationQuery()
   @ApiHttpErrorResponses()
-  @ApiHttpResponse({ status: 200, type: GetAllUsersResponseDto, description: "Returns all users" })
-  @Get("all")
+  @ApiHttpResponse({ status: 200, type: PaginationResponseDto, description: "Returns all users" })
+  @Get("")
   @UseGuards(JWTRoleGuard(CONFIGS.ROLES.SUPER_ADMIN))
   async getAllUsers(@PaginationQuery() paginationDto: PaginationDto) {
     const result = await this.usersService.getAllUsers(paginationDto);
     return new HttpResponse("All users", result, HttpStatus.OK);
+  }
+
+  @ApiOperation({ summary: "Create User" })
+  @ApiBearerAuth()
+  @ApiHttpErrorResponses()
+  @ApiHttpResponse({ status: 201, type: User, description: "Creates a new user" })
+  @Post()
+  @UseGuards(JWTRoleGuard(CONFIGS.ROLES.SUPER_ADMIN))
+  async createUser(@Body() createUserDto: CreateUserDto) {
+    const result = await this.usersService.createUser(createUserDto);
+    return new HttpResponse("User created successfully", result, HttpStatus.CREATED);
+  }
+
+  @ApiOperation({ summary: "Get a User" })
+  @ApiBearerAuth()
+  @ApiHttpErrorResponses()
+  @ApiHttpResponse({ status: 200, type: User, description: "Returns a user" })
+  @Get(":userId")
+  @UseGuards(JWTRoleGuard(CONFIGS.ROLES.SUPER_ADMIN))
+  async getUser(@Param("userId") userId: string) {
+    const result = await this.usersService.getUserById(userId);
+    return new HttpResponse("User", result, HttpStatus.OK);
+  }
+
+  @ApiOperation({ summary: "Update User" })
+  @ApiBearerAuth()
+  @ApiHttpErrorResponses()
+  @ApiHttpResponse({ status: 200, type: User, description: "Updates the user information" })
+  @Put(":userId")
+  @UseGuards(JWTRoleGuard(CONFIGS.ROLES.USER))
+  async updateUserProfile(@Body() updateUserDto: UpdateUserDto, @Param("userId") userId: string) {
+    const result = await this.usersService.updateUser(userId, { ...updateUserDto });
+    return new HttpResponse("User profile updated", result, HttpStatus.OK);
+  }
+
+  @ApiOperation({ summary: "Delete User" })
+  @ApiBearerAuth()
+  @ApiHttpErrorResponses()
+  @ApiHttpResponse({ status: 200, type: User, description: "Deletes a user" })
+  @Delete(":userId")
+  @UseGuards(JWTRoleGuard(CONFIGS.ROLES.SUPER_ADMIN))
+  async deleteUser(@Param("userId") userId: string, @Request() req: Request & { user: User }) {
+    if (userId === req.user._id.toString()) {
+      throw new BadRequestException("You cannot delete your own account");
+    }
+    const result = await this.usersService.deleteUser(userId);
+    return new HttpResponse("User deleted successfully", result, HttpStatus.OK);
   }
 }

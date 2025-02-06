@@ -1,1 +1,0 @@
-docker run --name arewaflix-container -p 4000:4000 --env-file .env.prod arewaflix:1

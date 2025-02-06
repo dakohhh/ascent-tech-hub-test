@@ -1,8 +1,8 @@
 {
-  "name": "ArewaFlix",
+  "name": "ascent",
   "version": "0.0.1",
-  "description": "ArewaFlix Backend",
-  "author": "Marvellous Solomon & wisdom Dakoh <marvelloussolomon49@gmail.com>",
+  "description": "Ascent Backend",
+  "author": "Wisdom Dakoh <wiizzydreadmill@@gmail.com>",
   "license": "MIT",
   "scripts": {
     "preinstall": "npx only-allow yarn",
@@ -137,7 +137,16 @@
       "**/*.(t|j)s"
     ],
     "coverageDirectory": "../coverage",
-    "testEnvironment": "node"
+    "testEnvironment": "node",
+    "moduleNameMapper": {
+      "^src/(.*)$": "<rootDir>/$1"
+    },
+    "setupFiles": ["<rootDir>/common/test/jest.setup.ts"],
+    "globals": {
+      "ts-jest": {
+        "tsconfig": "tsconfig.json"
+      }
+    }
   },
   "packageManager": "yarn@1.22.22"
 }

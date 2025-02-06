@@ -1,8 +1,6 @@
 import { Module } from "@nestjs/common";
 import { JwtModule } from "@nestjs/jwt";
-
 import { UsersService } from "./users.service";
-import { AwsModule } from "src/aws/aws.module";
 import { UsersController } from "./users.controller";
 import { MongooseModule } from "@nestjs/mongoose";
 import { User, UserDocument, UserSchema } from "./user.schema";
@@ -23,7 +21,6 @@ import { User, UserDocument, UserSchema } from "./user.schema";
         },
       },
     ]),
-    AwsModule,
   ],
   controllers: [UsersController],
   providers: [UsersService],

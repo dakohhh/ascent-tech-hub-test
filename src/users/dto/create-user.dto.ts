@@ -1,8 +1,8 @@
 import { ApiProperty } from "@nestjs/swagger";
-import { IsEmail, IsEnum, IsNotEmpty, IsPhoneNumber, IsString, MinLength } from "class-validator";
-import { Gender } from "src/users/user.schema";
+import { IsEmail, IsEnum, IsNotEmpty, IsPhoneNumber, IsString } from "class-validator";
+import { Gender } from "../user.schema";
 
-export class RegisterDto {
+export class CreateUserDto {
   @ApiProperty()
   @IsString()
   @IsEmail()
@@ -26,7 +26,6 @@ export class RegisterDto {
   @ApiProperty()
   @IsString()
   @IsNotEmpty()
-  @MinLength(6)
   password: string;
 
   @ApiProperty({ enum: Gender })
