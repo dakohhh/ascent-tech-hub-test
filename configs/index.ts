@@ -58,6 +58,30 @@ const GLOBAL_CONSTANTS = {
     USER: "user",
     SUPER_ADMIN: "super-admin",
   },
+
+  // Rate Limiting
+  RATE_LIMIT: {
+    STRICT: {
+      // 10 requests per minute
+      TTL: 60,
+      LIMIT: 10,
+    },
+    MODERATE: {
+      // 30 requests per minute
+      TTL: 60,
+      LIMIT: 30,
+    },
+    RELAXED: {
+      // 100 requests per minute
+      TTL: 60,
+      LIMIT: 100,
+    },
+    MINIMAL: {
+      // 300 requests per minute
+      TTL: 60,
+      LIMIT: 300,
+    },
+  },
 };
 
 const CONFIG_BUILDER = {

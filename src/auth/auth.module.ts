@@ -14,5 +14,6 @@ import { MongooseModule } from "@nestjs/mongoose";
   imports: [MongooseModule.forFeature([{ name: User.name, schema: UserSchema }]), PassportModule, TokenModule, UsersModule],
   providers: [AuthService, JwtStrategy, JwtRefreshStrategy, LocalStrategy],
   controllers: [AuthController],
+  exports: [AuthService],
 })
 export class AuthModule {}

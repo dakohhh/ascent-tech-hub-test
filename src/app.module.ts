@@ -1,4 +1,4 @@
-import { APP_FILTER } from "@nestjs/core";
+import { APP_FILTER, APP_GUARD } from "@nestjs/core";
 import { RedisClientOptions } from "redis";
 import { ConfigModule } from "@nestjs/config";
 import { CommandModule } from "nestjs-command";
@@ -15,11 +15,25 @@ import { DatabaseModule } from "./database/database.module";
 import { MiddlewareConsumer, Module, NestModule } from "@nestjs/common";
 import { SentryGlobalFilter, SentryModule } from "@sentry/nestjs/setup";
 import { LoggerMiddleware } from "./common/middlewares/logger.middleware";
+import { ThrottlerModule } from "@nestjs/throttler";
+import { throttlerConfig } from "./common/config/rate-limit.config";
+import { CustomThrottlerGuard } from "./common/guards/throttler.guard";
 
 @Module({
-  imports: [SentryModule.forRoot(), CacheModule.register<RedisClientOptions>({ isGlobal: true, store: redisStore, url: CONFIGS.REDIS_URI }), UsersModule, DatabaseModule, AuthModule, TokenModule, ConfigModule.forRoot({ isGlobal: true, load: [configuration] }), CommandModule, CommonModule],
+  imports: [
+    SentryModule.forRoot(),
+    CacheModule.register<RedisClientOptions>({ isGlobal: true, store: redisStore, url: CONFIGS.REDIS_URI }),
+    UsersModule,
+    DatabaseModule,
+    AuthModule,
+    TokenModule,
+    ConfigModule.forRoot({ isGlobal: true, load: [configuration] }),
+    CommandModule,
+    CommonModule,
+    ThrottlerModule.forRoot(throttlerConfig),
+  ],
   controllers: [AppController],
-  providers: [{ provide: APP_FILTER, useClass: SentryGlobalFilter }, AppService],
+  providers: [AppService, { provide: APP_FILTER, useClass: SentryGlobalFilter }, { provide: APP_GUARD, useClass: CustomThrottlerGuard }],
 })
 export class AppModule implements NestModule {
   configure(consumer: MiddlewareConsumer) {

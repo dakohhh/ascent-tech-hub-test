@@ -4,7 +4,7 @@ export class HttpResponse<T> {
   @ApiProperty()
   message: string;
 
-  @ApiProperty({ type: "object" })
+  @ApiProperty()
   data: T;
 
   @ApiProperty()
