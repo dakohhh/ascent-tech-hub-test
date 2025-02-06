@@ -89,6 +89,7 @@ const CONFIG_BUILDER = {
 
     SWAGGER: {
       PATH: "/docs",
+      USERNAME: "admin",
       PASSWORD: "password",
     },
   },
@@ -126,6 +127,7 @@ const CONFIG_BUILDER = {
 
     SWAGGER: {
       PATH: "/docs",
+      USERNAME: process.env.SWAGGER_USERNAME!,
       PASSWORD: process.env.SWAGGER_PASSWORD!,
     },
   },
@@ -154,6 +156,7 @@ const CONFIG_BUILDER = {
 
     SWAGGER: {
       PATH: "/docs",
+      USERNAME: "admin",
       PASSWORD: "password",
     },
   },

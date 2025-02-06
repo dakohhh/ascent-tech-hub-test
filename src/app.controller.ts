@@ -22,4 +22,11 @@ export class AppController {
   getError() {
     throw new HttpException("My first Sentry error!", 500);
   }
+
+  @ApiOperation({ summary: "Health Check" })
+  @ApiResponse({ status: 200, type: String, description: "Returns a health check" })
+  @Get("/health")
+  getHealth() {
+    return "OK";
+  }
 }

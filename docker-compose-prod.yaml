@@ -1,0 +1,57 @@
+services:
+  server:
+    restart: always
+    container_name: server
+    build:
+      context: .
+    ports:
+      - "${PORT}:${PORT}"
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:${PORT}/health"]
+      interval: 1m30s
+      timeout: 30s
+      retries: 5
+      start_period: 5s
+    environment:
+      - NODE_ENV=production
+      - PORT=${PORT}
+      - JWT_SECRET=${JWT_SECRET}
+      - MONGO_URI=${MONGO_URI}
+      - REDIS_URI=redis://redis:6379
+      - SWAGGER_USERNAME=${SWAGGER_USERNAME}
+      - SWAGGER_PASSWORD=${SWAGGER_PASSWORD}
+    networks:
+      - backend_network
+    logging:
+      driver: "json-file" # Stores logs in JSON format in host system
+      options:
+        max-size: "10m" # Maximum size of log file
+        max-file: "3" # Maximum number of log files
+    depends_on:
+      redis:
+        condition: service_healthy
+
+  redis:
+    container_name: redis-db
+    image: redis:latest
+    ports:
+      - 6379:6379
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 5s
+    networks:
+      - backend_network
+    restart: always
+    volumes:
+      - redis:/data
+
+networks:
+  backend_network:
+    driver: bridge
+
+volumes:
+  redis:
+    driver: local

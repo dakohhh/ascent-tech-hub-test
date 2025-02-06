@@ -12,12 +12,12 @@ import { AllExceptionFilter } from "./common/filters/all-exception.filter";
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
 
-  app.use([CONFIGS.SWAGGER.PATH, `${CONFIGS.SWAGGER.PATH}-json`, `${CONFIGS.SWAGGER.PATH}-yaml`], basicAuth({ challenge: true, users: { admin: CONFIGS.SWAGGER.PASSWORD } }));
+  const configService = app.get(ConfigService);
+
+  app.use([CONFIGS.SWAGGER.PATH, `${CONFIGS.SWAGGER.PATH}-json`, `${CONFIGS.SWAGGER.PATH}-yaml`], basicAuth({ challenge: true, users: { [CONFIGS.SWAGGER.USERNAME]: CONFIGS.SWAGGER.PASSWORD } }));
 
   const redisIoAdapter = new RedisIoAdapter(app);
   await redisIoAdapter.connectToRedis();
-
-  const configService = app.get(ConfigService);
 
   app.useWebSocketAdapter(redisIoAdapter);
   app.enableCors({ credentials: true, origin: [...CONFIGS.CORS_ALLOWED_ORIGINS] });
