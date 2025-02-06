@@ -1,7 +1,7 @@
 import Redis from "ioredis";
 import { CONFIGS } from "../../../configs";
 import { ThrottlerModuleOptions } from "@nestjs/throttler";
-const redis = new Redis(CONFIGS.REDIS_URI);
+// const redis = new Redis(CONFIGS.REDIS_URI);
 
 export const throttlerConfig: ThrottlerModuleOptions = {
   limit: 10,
