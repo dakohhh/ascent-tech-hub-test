@@ -16,8 +16,8 @@ services:
       - NODE_ENV=production
       - PORT=${PORT}
       - JWT_SECRET=${JWT_SECRET}
-      - MONGO_URI=${MONGO_URI}
-      - REDIS_URI=redis://redis:6379
+      - MONGO_URI=mongodb://mongo:27017/ascent
+      - REDIS_URI=redis://redis:6377
       - SWAGGER_USERNAME=${SWAGGER_USERNAME}
       - SWAGGER_PASSWORD=${SWAGGER_PASSWORD}
     networks:
@@ -35,7 +35,7 @@ services:
     container_name: redis-db
     image: redis:latest
     ports:
-      - 6379:6379
+      - 6377:6377
     healthcheck:
       test: ["CMD", "redis-cli", "ping"]
       interval: 30s
@@ -48,10 +48,22 @@ services:
     volumes:
       - redis:/data
 
+  mongo:
+    image: mongo:latest
+    ports:
+      - 27017:27017
+    networks:
+      - backend_network
+
+    volumes:
+      - mongo_data:/data/db
+
 networks:
   backend_network:
     driver: bridge
 
 volumes:
   redis:
+    driver: local
+  mongo_data:
     driver: local
