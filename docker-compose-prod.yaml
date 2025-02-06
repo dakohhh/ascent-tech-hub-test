@@ -48,16 +48,6 @@ services:
     volumes:
       - redis:/data
 
-  mongo:
-    image: mongo:latest
-    ports:
-      - 27017:27017
-    networks:
-      - backend_network
-
-    volumes:
-      - mongo_data:/data/db
-
 networks:
   backend_network:
     driver: bridge
