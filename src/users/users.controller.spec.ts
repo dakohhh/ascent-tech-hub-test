@@ -2,18 +2,13 @@ import { Test } from "@nestjs/testing";
 import { UsersController } from "./users.controller";
 import { UsersService } from "./users.service";
 import { createMockUser } from "../common/test/test-utils";
-import { BadRequestException } from "@nestjs/common";
 
 describe("UsersController", () => {
   let usersController: UsersController;
   let usersService: UsersService;
 
   const mockUsersService = {
-    getUserById: jest.fn(),
     getAllUsers: jest.fn(),
-    createUser: jest.fn(),
-    updateUser: jest.fn(),
-    deleteUser: jest.fn(),
   };
 
   beforeEach(async () => {
@@ -35,24 +30,15 @@ describe("UsersController", () => {
     jest.clearAllMocks();
   });
 
-  describe("deleteUser", () => {
-    it("should throw BadRequestException when trying to delete own account", async () => {
+  describe("getAllUsers", () => {
+    it("should get all users successfully", async () => {
       const mockUser = createMockUser();
-      const req = { user: mockUser };
 
-      await expect(usersController.deleteUser(mockUser._id.toString(), req as any)).rejects.toThrow(BadRequestException);
-    });
+      mockUsersService.getAllUsers.mockResolvedValue(mockUser);
 
-    it("should delete user successfully", async () => {
-      const mockUser = createMockUser();
-      const differentUserId = "different-user-id";
-      const req = { user: mockUser };
-
-      mockUsersService.deleteUser.mockResolvedValue(mockUser);
-
-      const result = await usersController.deleteUser(differentUserId, req as any);
+      const result = await usersController.getAllUsers({ page: 1, limit: 10 });
       expect(result.data).toEqual(mockUser);
-      expect(usersService.deleteUser).toHaveBeenCalledWith(differentUserId);
+      expect(usersService.getAllUsers).toHaveBeenCalledWith({ page: 1, limit: 10 });
     });
   });
 

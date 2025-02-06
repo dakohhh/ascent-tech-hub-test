@@ -1,6 +1,6 @@
 import { LoginDto } from "./dto/login.dto";
 import { AuthService } from "./auth.service";
-import { CONFIGS } from "configs";
+import { CONFIGS } from "../../configs";
 import { RegisterDto } from "./dto/register.dto";
 import { User } from "src/users/user.schema";
 import { TokenService } from "src/token/token.service";
