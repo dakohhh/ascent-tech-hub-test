@@ -2,6 +2,17 @@
 
 ## Installation
 
+### Prerequisites
+
+- Node.js version specified in `.nvmrc`
+  ```bash
+  # Install and use the correct Node version
+  nvm install   # Installs version from .nvmrc
+  nvm use      # Switches to version from .nvmrc
+  ```
+- Docker and Docker Compose
+- Yarn package manager
+
 ```bash
 # install dependencies
 yarn install
@@ -29,6 +40,23 @@ yarn start:dev
 # run the app
 yarn start:prod
 ```
+
+### Swagger UI
+
+```bash
+# Swagger UI
+http://localhost:{$PORT}/docs
+```
+
+### Basic Auth For Swagger UI (DEVELOPMENT)
+Username: `admin`
+Password: `password`
+
+### Basic Auth For Swagger UI (PRODUCTION)
+Username: `${SWAGGER_USERNAME}`
+Password: `${SWAGGER_PASSWORD}`
+Note: Check .env.example
+
 
 ## Technical Challenges & Solutions
 
@@ -241,8 +269,8 @@ build-and-push:
 ## Stay in touch
 
 - Author - [Wisdom Dakoh](https://github.com/dakohhh)
-- Website - [ASCENT HUB TEST](https://arewaflix)
-
+- Website - [ASCENT HUB TEST](https://ascent-tech-hub-test.krakabet.com.ng)
+- Swagger UI - [ASCENT HUB TEST Swagger docs](https://ascent-tech-hub-test.krakabet.com.ng/docs)
 ## API Routes Documentation
 
 ### Authentication Routes (`/api/auth`)
