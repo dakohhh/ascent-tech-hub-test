@@ -1,39 +1,27 @@
 # Stage 1: Build
-FROM node:20.11.1-alpine AS build
+FROM node:20-alpine AS builder
 
-RUN apk update && \
-    apk upgrade && \
-    apk add --no-cache git dumb-init
+WORKDIR /app
 
-# Set the working directory to /usr/src/app
-WORKDIR /usr/src/app
+COPY package.json yarn.lock ./
+RUN yarn install --frozen-lockfile
 
-# Copy package.json and yarn.lock files to the working directory
-COPY yarn.lock ./
-COPY package.json ./
-
-# allow unsafe-perm to fix permission issues
-RUN yarn config set unsafe-perm true
-
-# Install dependencies using yarn
-RUN yarn install
-
-# Copy the rest of the application code to the working directory
 COPY . .
-
-RUN yarn run build
+RUN yarn build
 
 # Stage 2: Production
-FROM node:20.11.1-alpine
+FROM node:20-alpine
 
-# Set the working directory to /usr/src/app
-WORKDIR /usr/src/app
+WORKDIR /app
 
-# Copy only the necessary files from the build stage
-COPY --from=build /usr/src/app/ /usr/src/app
+COPY package.json yarn.lock ./
+RUN yarn install --production --frozen-lockfile
 
-# Expose the port the app runs on
+COPY --from=builder /app/dist ./dist
+COPY --from=builder /app/configs ./configs
+
+ENV NODE_ENV=production
+
 EXPOSE 4000
 
-# Command to run the application
-CMD ["yarn", "start:prod"]
+CMD ["node", "dist/src/main"]
